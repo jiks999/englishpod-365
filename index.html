@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EnglishPod 365 · 精听工作台</title>
+<style>
+:root{--bg:#fff;--fg:#16181d;--muted:#6b7280;--line:#e5e7eb;--card:#f6f7f9;
+  --accent:#2563eb;--ok:#059669;--warn:#b45309;--bad:#9ca3af;--star:#eab308}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--fg:#e6e8ec;--muted:#9aa1ab;
+  --line:#242932;--card:#171b21;--accent:#5b93ff;--ok:#34d399;--warn:#fbbf24;--bad:#6b7280;--star:#facc15}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.55 -apple-system,"Segoe UI",system-ui,"Microsoft YaHei",sans-serif;
+  display:flex;flex-direction:column;overflow:hidden}
+header{padding:9px 16px 8px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;flex:0 0 auto}
+.hrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+h1{font-size:15px;margin:0;font-weight:650;white-space:nowrap}
+h1 span{color:var(--muted);font-weight:400;font-size:12px;margin-left:6px}
+input[type=search]{flex:1 1 180px;min-width:150px;padding:6px 10px;border:1px solid var(--line);
+  border-radius:7px;background:var(--card);color:var(--fg);font-size:13px;outline:none}
+input[type=search]:focus{border-color:var(--accent)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;
+  padding:3px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+.chip b{font-weight:600;opacity:.75;margin-left:3px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.on b{opacity:.9}
+.sep{color:var(--line)}
+main{flex:1 1 auto;display:grid;grid-template-columns:360px 1fr;min-height:0}
+@media (max-width:860px){main{grid-template-columns:1fr;grid-template-rows:42% 58%}}
+#listcol{overflow-y:auto;border-right:1px solid var(--line);min-height:0}
+.row{display:grid;grid-template-columns:48px 13px 22px 1fr auto;gap:5px;align-items:center;
+  padding:7px 11px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+.row:hover{background:var(--card)}
+.row.on{background:var(--card);box-shadow:inset 3px 0 0 var(--accent)}
+.row .no{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.row .st{font-size:12px;text-align:center;color:var(--bad)}
+.row .st.s1{color:var(--accent)}
+.row .st.s2{color:var(--ok)}
+.row .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .t .star{color:var(--star);margin-right:2px}
+.row .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.row .dot.full{background:var(--warn)}
+.row .dot.online{background:var(--accent);opacity:.7}
+.row .dot.none{background:var(--bad);opacity:.5}
+.badge{display:inline-block;min-width:17px;text-align:center;border-radius:4px;font-size:11px;
+  font-weight:700;padding:1px 0;color:#fff;background:var(--muted)}
+.badge.B{background:#0ea5e9}.badge.C{background:#8b5cf6}.badge.D{background:#f59e0b}
+.badge.E{background:#ef4444}.badge.F{background:#111827}
+#detail{overflow-y:auto;min-height:0;padding:16px 20px 40px}
+#detail .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+#detail h2{margin:0;font-size:18px;line-height:1.35}
+.meta{color:var(--muted);font-size:12px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:7px;
+  padding:5px 11px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.dis{opacity:.4;pointer-events:none}
+audio{width:100%;margin:6px 0 2px}
+.spd{display:flex;gap:4px}
+.spd .chip{padding:2px 8px}
+.tabs{display:flex;gap:6px;margin:16px 0 8px;border-bottom:1px solid var(--line)}
+.tab{padding:6px 12px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+pre.body{white-space:pre-wrap;word-break:break-word;background:var(--card);border:1px solid var(--line);
+  border-radius:9px;padding:12px 14px;font:13.5px/1.75 ui-monospace,Consolas,"Segoe UI",sans-serif;margin:0}
+mark{background:#fde68a;color:#111}
+.note{color:var(--muted);font-size:12px;margin:8px 0 0}
+.empty{color:var(--muted);padding:40px 0;text-align:center}
+.notewrap{margin:14px 0 4px;border:1px solid var(--line);border-radius:9px;background:var(--card);overflow:hidden}
+.notehead{display:flex;gap:8px;align-items:center;padding:7px 11px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.notehead b{color:var(--fg);font-size:12.5px}
+.notehead .right{margin-left:auto}
+textarea#noteInput{width:100%;min-height:110px;resize:vertical;border:0;outline:none;background:transparent;
+  color:var(--fg);padding:10px 12px;font:13.5px/1.7 -apple-system,"Segoe UI",system-ui,"Microsoft YaHei",sans-serif}
+.stbar{display:flex;gap:5px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:#111;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;pointer-events:none;
+  transition:.22s;z-index:99;max-width:80vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-color-scheme:dark){#toast{background:#e6e8ec;color:#111}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>EnglishPod 365<span id="cnt"></span></h1>
+    <input id="q" type="search" placeholder="搜索期号 / 标题 / 笔记内容">
+    <div class="chips" id="levels"></div>
+    <div class="chips" id="dataops">
+      <button class="chip" id="btnExportMd">导出笔记 .md</button>
+      <button class="chip" id="btnBackup">备份 .json</button>
+      <button class="chip" id="btnRestore">恢复</button>
+    </div>
+  </div>
+  <div class="hrow">
+    <div class="chips" id="progs"></div>
+    <span class="sep">|</span>
+    <div class="chips" id="extra">
+      <button class="chip on" data-sort="id">按期号</button>
+      <button class="chip" data-sort="level">按难度</button>
+      <button class="chip" id="onlyAudio">仅有音频</button>
+    </div>
+    <span class="sep">|</span>
+    <div class="chips" id="srcops">
+      <span class="meta">播放源</span>
+      <button class="chip" data-src="auto">自动</button>
+      <button class="chip" data-src="local">仅本地</button>
+      <button class="chip" data-src="online">仅在线</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="listcol"></div>
+  <section id="detail"><div class="empty">左侧选一期开始</div></section>
+</main>
+<div id="toast"></div>
+<input type="file" id="fileIn" accept=".json,application/json" style="display:none">
+
+<script src="data.js"></script>
+<script>
+var DATA = window.EP_DATA.items;
+var LITE = !!window.EP_DATA.lite;
+var LEVELS = {B:'初级',C:'中级',D:'中高级',E:'高级',F:'精通','':'未标'};
+var ORDER = {B:0,C:1,D:2,E:3,F:4,'':5};
+var STORE_KEY = 'ep_data_v2';
+var LEGACY_KEY = 'ep_done';
+var ST_NAME = ['未开始','精听中','已完成'];
+var ST_MARK = ['','◐','✓'];
+
+var store = {marks:{}};
+function loadStore(){
+  var raw = null;
+  try { raw = localStorage.getItem(STORE_KEY); } catch (e) {}
+  if (raw){
+    try {
+      var o = JSON.parse(raw);
+      if (o && o.marks && typeof o.marks === 'object'){ store = {marks:o.marks}; return; }
+    } catch (e2) {}
+  }
+  try {
+    var old = JSON.parse(localStorage.getItem(LEGACY_KEY) || '[]');
+    for (var i = 0; i < old.length; i++){
+      store.marks['' + old[i]] = {s:2, star:0, note:'', ts:Date.now()};
+    }
+    if (old.length) saveStore();
+  } catch (e3) {}
+}
+function saveStore(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+  catch (e) { toast('保存失败：浏览器存储不可用'); }
+}
+function mk(id, create){
+  var k = '' + id;
+  if (!store.marks[k] && create) store.marks[k] = {s:0, star:0, note:'', ts:Date.now()};
+  return store.marks[k] || null;
+}
+function stOf(id){ var m = mk(id, false); return m ? (m.s || 0) : 0; }
+function starOf(id){ var m = mk(id, false); return !!(m && m.star); }
+function noteOf(id){ var m = mk(id, false); return m ? (m.note || '') : ''; }
+function hasRec(id){
+  var m = mk(id, false);
+  return !!(m && ((m.s || 0) > 0 || m.star || (m.note && m.note.length)));
+}
+
+function byId(x){ return document.getElementById(x); }
+function pad4(n){ return ('0000' + n).slice(-4); }
+function esc(s){
+  return String(s).replace(/[&<>"]/g, function (c) {
+    if (c === '&') return '&amp;';
+    if (c === '<') return '&lt;';
+    if (c === '>') return '&gt;';
+    return '&quot;';
+  });
+}
+function codeName(c){ return LEVELS[c] || '未标'; }
+function timeStr(d){
+  var t = d || new Date();
+  function p(x){ return (x < 10 ? '0' : '') + x; }
+  return t.getFullYear() + '-' + p(t.getMonth()+1) + '-' + p(t.getDate()) + ' ' +
+         p(t.getHours()) + ':' + p(t.getMinutes());
+}
+var toastTimer = null;
+function toast(msg){
+  var t = byId('toast');
+  t.textContent = msg;
+  t.className = 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.className = ''; }, 2600);
+}
+
+var state = {q:'', level:'all', prog:'all', sort:'id', onlyAudio:false, cur:null, tab:'text'};
+var curItem = null;
+var curIsOnline = false;
+var curKind = '';
+var curSrc = '';
+var SRC_KEY = 'ep_source';
+var srcMode = 'auto';
+try { srcMode = localStorage.getItem(SRC_KEY) || 'auto'; } catch (e4) {}
+
+function pickSource(d){
+  var hasLocal = !!d.audio;
+  var hasOnline = !!d.online;
+  if (srcMode === 'local'){
+    if (hasLocal) return {src: d.audio, kind: 'local'};
+    if (hasOnline) return {src: d.online, kind: 'online', fb: '本地没有，已回退在线'};
+  } else if (srcMode === 'online'){
+    if (hasOnline) return {src: d.online, kind: 'online'};
+    if (hasLocal) return {src: d.audio, kind: 'local', fb: '在线不可用，已回退本地'};
+  } else {
+    if (hasLocal) return {src: d.audio, kind: 'local'};
+    if (hasOnline) return {src: d.online, kind: 'online'};
+  }
+  return null;
+}
+function renderSrcOps(){
+  var box = byId('srcops');
+  var bs = box.querySelectorAll('[data-src]');
+  for (var i = 0; i < bs.length; i++){
+    bs[i].className = 'chip' + (bs[i].getAttribute('data-src') === srcMode ? ' on' : '');
+  }
+}
+
+var counts = {};
+for (var i = 0; i < DATA.length; i++){
+  var cc = DATA[i].code || '';
+  counts[cc] = (counts[cc] || 0) + 1;
+}
+var chipsDef = [
+  ['all','全部',DATA.length],
+  ['B','B 初级',counts.B||0],
+  ['C','C 中级',counts.C||0],
+  ['D','D 中高级',counts.D||0],
+  ['E','E 高级',counts.E||0],
+  ['F','F 精通',counts.F||0],
+  ['','未标',counts['']||0]
+];
+var chipsHtml = '';
+for (var j = 0; j < chipsDef.length; j++){
+  var cd = chipsDef[j];
+  chipsHtml += '<button class="chip' + (cd[0]==='all'?' on':'') + '" data-lv="' + cd[0] + '">' +
+    cd[1] + '<b>' + cd[2] + '</b></button>';
+}
+byId('levels').innerHTML = chipsHtml;
+
+function progCounts(){
+  var c = {all:DATA.length, todo:0, doing:0, done:0, note:0, star:0};
+  for (var i = 0; i < DATA.length; i++){
+    var id = DATA[i].id, s = stOf(id), n = noteOf(id), st = starOf(id);
+    if (s === 0) c.todo++; else if (s === 1) c.doing++; else c.done++;
+    if (n) c.note++;
+    if (st) c.star++;
+  }
+  return c;
+}
+function renderProgs(){
+  var c = progCounts();
+  var defs = [
+    ['all','全部',c.all],['todo','未开始',c.todo],['doing','精听中',c.doing],
+    ['done','已完成',c.done],['note','有笔记',c.note],['star','星标',c.star]
+  ];
+  var h = '';
+  for (var i = 0; i < defs.length; i++){
+    h += '<button class="chip' + (defs[i][0]===state.prog?' on':'') + '" data-pg="' + defs[i][0] + '">' +
+      defs[i][1] + '<b>' + defs[i][2] + '</b></button>';
+  }
+  byId('progs').innerHTML = h;
+}
+
+byId('levels').addEventListener('click', function (ev){
+  var b = ev.target.closest('.chip'); if (!b) return;
+  state.level = b.getAttribute('data-lv');
+  var kids = this.children;
+  for (var k = 0; k < kids.length; k++) kids[k].className = 'chip' + (kids[k]===b?' on':'');
+  render();
+});
+byId('progs').addEventListener('click', function (ev){
+  var b = ev.target.closest('.chip'); if (!b) return;
+  state.prog = b.getAttribute('data-pg');
+  renderProgs();
+  render();
+});
+byId('extra').addEventListener('click', function (ev){
+  var b = ev.target.closest('.chip'); if (!b) return;
+  if (b.id === 'onlyAudio'){
+    state.onlyAudio = !state.onlyAudio;
+    b.className = 'chip' + (state.onlyAudio?' on':'');
+  } else {
+    state.sort = b.getAttribute('data-sort');
+    var bs = this.querySelectorAll('[data-sort]');
+    for (var k = 0; k < bs.length; k++) bs[k].className = 'chip' + (bs[k]===b?' on':'');
+  }
+  render();
+});
+byId('q').addEventListener('input', function (){
+  state.q = this.value.trim().toLowerCase();
+  render();
+});
+
+byId('srcops').addEventListener('click', function (ev){
+  var b = ev.target.closest('.chip');
+  if (!b) return;
+  var m = b.getAttribute('data-src');
+  if (!m) return;
+  srcMode = m;
+  try { localStorage.setItem(SRC_KEY, m); } catch (e5) {}
+  renderSrcOps();
+  if (curItem) openItem(curItem.id);
+  toast('播放源：' + (m === 'auto' ? '自动（优先本地）' : (m === 'local' ? '仅本地文件' : '仅在线 archive.org')));
+});
+
+function filtered(){
+  var out = [];
+  for (var i = 0; i < DATA.length; i++){
+    var d = DATA[i], id = d.id;
+    if (state.level !== 'all' && (d.code || '') !== state.level) continue;
+    if (state.onlyAudio && !d.atype) continue;
+    var s = stOf(id), nt = noteOf(id), st = starOf(id);
+    if (state.prog === 'todo' && s !== 0) continue;
+    if (state.prog === 'doing' && s !== 1) continue;
+    if (state.prog === 'done' && s !== 2) continue;
+    if (state.prog === 'note' && !nt) continue;
+    if (state.prog === 'star' && !st) continue;
+    if (state.q){
+      var hay = (d.id + ' ' + d.title + ' ' + d.topic + ' ' + codeName(d.code || '') + ' ' + nt).toLowerCase();
+      if (hay.indexOf(state.q) < 0) continue;
+    }
+    out.push(d);
+  }
+  out.sort(function (x, y){
+    if (state.sort === 'level'){
+      var a = ORDER[x.code || ''], b = ORDER[y.code || ''];
+      if (a !== b) return a - b;
+    }
+    return x.id - y.id;
+  });
+  return out;
+}
+
+function render(){
+  var a = filtered();
+  var c = progCounts();
+  byId('cnt').textContent = ' ' + a.length + ' 期 · 已完成 ' + c.done + ' · 有笔记 ' + c.note;
+  var buf = '';
+  for (var i = 0; i < a.length; i++){
+    var d = a[i], s = stOf(d.id);
+    var dotCls = d.atype === 'dialog' ? '' : (d.atype === 'full' ? 'full' : (d.online ? 'online' : 'none'));
+    var dotTip = d.atype === 'dialog' ? '有对话段' : (d.atype === 'full' ? '仅整期' : (d.online ? '在线播放（archive.org）' : '无音频'));
+    var stCls = 'st' + (s ? ' s' + s : '');
+    buf += '<div class="row' + (state.cur === d.id ? ' on' : '') + '" data-id="' + d.id + '">' +
+      '<span class="no">' + pad4(d.id) + '</span>' +
+      '<span class="' + stCls + '" title="' + ST_NAME[s] + '">' + ST_MARK[s] + '</span>' +
+      '<span class="badge ' + (d.code || '') + '">' + (d.code || '–') + '</span>' +
+      '<span class="t">' + (starOf(d.id) ? '<span class="star">★</span>' : '') + esc(d.title) + '</span>' +
+      '<span class="dot ' + dotCls + '" title="' + dotTip + '"></span>' +
+      '</div>';
+  }
+  byId('listcol').innerHTML = buf || '<div class="empty">没有匹配的期</div>';
+}
+
+byId('listcol').addEventListener('click', function (ev){
+  var r = ev.target.closest('.row');
+  if (r) openItem(parseInt(r.getAttribute('data-id'), 10));
+});
+
+function highlight(s){
+  if (!state.q || state.q.length < 2) return esc(s);
+  var re = new RegExp('(' + state.q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return esc(s).replace(re, '<mark>$1</mark>');
+}
+function curSpeed(){ return parseFloat(localStorage.getItem('ep_speed') || '1'); }
+
+function openItem(id){
+  flushNote();
+  var d = null;
+  for (var i = 0; i < DATA.length; i++) if (DATA[i].id === id){ d = DATA[i]; break; }
+  if (!d) return;
+  curItem = d;
+  state.cur = id;
+  var rows = document.querySelectorAll('.row');
+  for (var r = 0; r < rows.length; r++){
+    rows[r].className = 'row' + (parseInt(rows[r].getAttribute('data-id'), 10) === id ? ' on' : '');
+  }
+  var s = stOf(id);
+  var stBtns = '';
+  for (var q = 0; q < 3; q++){
+    stBtns += '<button class="chip' + (s === q ? ' on' : '') + '" data-s="' + q + '">' + ST_NAME[q] + '</button>';
+  }
+  var head = '<div class="head">' +
+    '<span class="badge ' + (d.code || '') + '">' + (d.code || '–') + '</span>' +
+    '<h2>' + pad4(d.id) + ' · ' + esc(d.title) + '</h2>' +
+    '<span class="meta">' + esc(d.topic) + ' · ' + codeName(d.code || '') + '</span></div>' +
+    '<div class="toolbar">' +
+    '<span class="meta">状态</span><div class="stbar" id="stbar">' + stBtns + '</div>' +
+    '<button class="btn' + (starOf(id) ? ' ok' : '') + '" id="star">' + (starOf(id) ? '★ 已星标' : '☆ 星标') + '</button>' +
+    '<a class="btn' + (d.pdf ? '' : ' dis') + '" href="' + d.pdf + '" target="_blank">打开 PDF 讲义</a>' +
+    '<a class="btn' + (d.srt ? '' : ' dis') + '" href="' + d.srt + '" target="_blank">打开 SRT 字幕</a></div>';
+
+  var player = '';
+  var pick = pickSource(d);
+  curKind = pick ? pick.kind : '';
+  curSrc = pick ? pick.src : '';
+  curIsOnline = curKind === 'online';
+  if (pick){
+    var spd = '';
+    var vs = [0.7,0.8,0.9,1,1.2];
+    for (var k2 = 0; k2 < vs.length; k2++){
+      spd += '<button class="chip' + (vs[k2] === curSpeed() ? ' on' : '') + '" data-v="' + vs[k2] + '">' + vs[k2] + '×</button>';
+    }
+    var srcLine = '<div class="toolbar"><span class="meta">来源</span>' +
+      '<span class="meta" id="srcLabel" style="color:' + (curKind === 'online' ? 'var(--accent)' : 'var(--ok)') + '">' +
+      (curKind === 'online' ? '在线 · archive.org（需联网）' : '本地文件') + '</span>' +
+      (pick.fb ? '<span class="meta" style="color:var(--warn)">' + pick.fb + '</span>' : '') +
+      (d.audio && d.online
+        ? '<button class="btn" id="swapSrc">换用' + (curKind === 'online' ? '本地' : '在线') + '</button>'
+        : '') +
+      '</div>';
+    player = '<audio id="player" controls preload="' + (curKind === 'online' ? 'none' : 'metadata') + '" src="' + pick.src + '"></audio>' +
+      srcLine +
+      '<div class="toolbar"><span class="meta">速度</span><div class="spd" id="spd">' + spd + '</div>' +
+      '<button class="btn" id="loop">循环</button>' +
+      '<button class="btn" id="prev">上一期</button>' +
+      '<button class="btn" id="next">下一期</button></div>';
+  } else {
+    player = '<div class="toolbar"><span class="meta" style="color:var(--warn)">' +
+      '这一期没有音频文件，可用 PDF 讲义和转写文本学习</span></div>';
+  }
+
+  var nt = noteOf(id);
+  var m0 = mk(id, false);
+  var noteState = nt ? ('已保存 ' + timeStr(new Date((m0 && m0.ts) || Date.now()))) : '';
+  var noteBox = '<div class="notewrap">' +
+    '<div class="notehead"><b>笔记</b><span>自动保存</span>' +
+    '<span class="right" id="noteState">' + noteState + '</span></div>' +
+    '<textarea id="noteInput" placeholder="生词、连读、易错点、跟读感受…（自动保存）">' + esc(nt) + '</textarea>' +
+    '</div>';
+
+  byId('detail').innerHTML = head + noteBox + player +
+    '<div class="tabs"><div class="tab on" data-tab="text">' + (LITE ? '精听提示' : '整期转写') + '</div>' +
+    (LITE ? '' : '<div class="tab" data-tab="pdf">PDF 预览</div>') + '</div>' +
+    '<div id="pane"></div>' +
+    '<p class="note">' + (LITE
+      ? '在线版：音频由 archive.org 公开存档提供，需要能访问 archive.org。文本讲义与本仓库无关，请自行获取。'
+      : '整期转写是 Whisper 自动识别的播客全文（含主持人讲解），纯对话原文在 PDF 讲义第 1 页。') + '</p>';
+  renderPane();
+  bindDetail();
+  var curRow = document.querySelector('.row.on');
+  if (curRow) curRow.scrollIntoView({block: 'nearest'});
+}
+
+function renderPane(){
+  var d = curItem;
+  if (!d) return;
+  if (state.tab === 'pdf'){
+    byId('pane').innerHTML = d.pdf
+      ? '<iframe src="' + d.pdf + '" style="width:100%;height:70vh;border:1px solid var(--line);border-radius:9px;background:#fff"></iframe>' +
+        '<p class="note">若这里空白，点上面「打开 PDF 讲义」（双击打开本页时浏览器会拦截本地 iframe 里的 PDF）。</p>'
+      : '<div class="empty">没有 PDF</div>';
+  } else {
+    byId('pane').innerHTML = d.text
+      ? '<pre class="body">' + highlight(d.text) + '</pre>'
+      : '<div class="empty">' + (LITE
+          ? '在线版不含转写文本。建议：先盲听 2-3 遍 → 打开官方 PDF 讲义对照 → 再回来听<br>（PDF 讲义版权属 Praxis Language，本仓库不提供）'
+          : '（无文本）') + '</div>';
+  }
+}
+
+var noteTimer = null;
+var noteDirty = false;
+function flushNote(){
+  var ta = byId('noteInput');
+  if (ta && noteDirty && curItem){
+    clearTimeout(noteTimer);
+    writeNote(curItem.id, ta.value);
+    noteDirty = false;
+  }
+}
+function writeNote(id, v){
+  var m = mk(id, true);
+  m.note = v;
+  m.ts = Date.now();
+  saveStore();
+  var el = byId('noteState');
+  if (el) el.textContent = '已保存 ' + timeStr();
+  renderProgs();
+}
+
+function bindDetail(){
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++){
+    tabs[i].addEventListener('click', function (){
+      state.tab = this.getAttribute('data-tab');
+      var all = document.querySelectorAll('.tab');
+      for (var k = 0; k < all.length; k++) all[k].className = 'tab' + (all[k]===this?' on':'');
+      renderPane();
+    });
+  }
+  byId('stbar').addEventListener('click', function (ev){
+    var b = ev.target.closest('.chip'); if (!b) return;
+    var s = parseInt(b.getAttribute('data-s'), 10);
+    var m = mk(curItem.id, true);
+    m.s = s; m.ts = Date.now();
+    saveStore();
+    var kids = this.children;
+    for (var k = 0; k < kids.length; k++) kids[k].className = 'chip' + (kids[k]===b?' on':'');
+    renderProgs(); render();
+    toast('已标记为「' + ST_NAME[s] + '」');
+  });
+  byId('star').addEventListener('click', function (){
+    var m = mk(curItem.id, true);
+    m.star = m.star ? 0 : 1; m.ts = Date.now();
+    saveStore();
+    this.className = 'btn' + (m.star ? ' ok' : '');
+    this.textContent = m.star ? '★ 已星标' : '☆ 星标';
+    renderProgs(); render();
+  });
+  var ta = byId('noteInput');
+  ta.addEventListener('input', function (){
+    noteDirty = true;
+    byId('noteState').textContent = '输入中…';
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(function(){ writeNote(curItem.id, ta.value); noteDirty = false; }, 500);
+  });
+  ta.addEventListener('blur', flushNote);
+
+  var p = byId('player');
+  if (p){
+    p.playbackRate = curSpeed();
+    if (curIsOnline){
+      p.addEventListener('error', function (){
+        toast('在线音频加载失败：需要能访问 archive.org，检查网络或代理');
+      });
+    }
+    var swap = byId('swapSrc');
+    if (swap){
+      swap.addEventListener('click', function (){
+        var d = curItem;
+        var alt = (curKind === 'local') ? d.online : d.audio;
+        if (!alt) return;
+        var t = p.currentTime || 0;
+        var r = p.playbackRate || 1;
+        var wasPlaying = !p.paused;
+        curKind = (curKind === 'local') ? 'online' : 'local';
+        curSrc = alt;
+        curIsOnline = (curKind === 'online');
+        p.preload = curIsOnline ? 'none' : 'metadata';
+        p.src = alt;
+        p.load();
+        p.playbackRate = r;
+        p.addEventListener('loadedmetadata', function once(){
+          p.removeEventListener('loadedmetadata', once);
+          if (t > 0 && isFinite(t)) p.currentTime = t;
+          if (wasPlaying) p.play();
+        });
+        var lab = byId('srcLabel');
+        if (lab){
+          lab.textContent = curIsOnline ? '在线 · archive.org（需联网）' : '本地文件';
+          lab.style.color = curIsOnline ? 'var(--accent)' : 'var(--ok)';
+        }
+        this.textContent = '换用' + (curIsOnline ? '本地' : '在线');
+        toast(curIsOnline ? '已切换到在线播放' : '已切换到本地文件');
+      });
+    }
+    byId('spd').addEventListener('click', function (ev){
+      var b = ev.target.closest('.chip'); if (!b) return;
+      p.playbackRate = parseFloat(b.getAttribute('data-v'));
+      localStorage.setItem('ep_speed', b.getAttribute('data-v'));
+      var kids = this.children;
+      for (var k = 0; k < kids.length; k++) kids[k].className = 'chip' + (kids[k]===b?' on':'');
+    });
+    var looping = false;
+    byId('loop').addEventListener('click', function (){
+      looping = !looping;
+      p.loop = looping;
+      this.className = 'btn' + (looping?' ok':'');
+    });
+    byId('prev').addEventListener('click', function (){ flushNote(); step(-1); });
+    byId('next').addEventListener('click', function (){ flushNote(); step(1); });
+  }
+}
+
+function step(dir){
+  var a = filtered(), idx = -1;
+  for (var i = 0; i < a.length; i++) if (a[i].id === state.cur) idx = i;
+  var nx = a[idx + dir];
+  if (!nx) return;
+  openItem(nx.id);
+  var row = document.querySelector('.row[data-id="' + nx.id + '"]');
+  if (row) row.scrollIntoView({block:'center'});
+}
+
+function download(name, text, mime){
+  var blob = new Blob([text], {type: mime || 'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1500);
+}
+function ymd(){
+  var t = new Date();
+  function p(x){ return (x<10?'0':'') + x; }
+  return '' + t.getFullYear() + p(t.getMonth()+1) + p(t.getDate());
+}
+function exportMarkdown(){
+  flushNote();
+  var ids = [], k;
+  for (k in store.marks) if (hasRec(k)) ids.push(parseInt(k, 10));
+  ids.sort(function(a,b){ return a-b; });
+  if (!ids.length){ toast('还没有任何标记或笔记'); return; }
+  var c = progCounts();
+  var L = [];
+  L.push('# EnglishPod 365 精听笔记');
+  L.push('');
+  L.push('- 导出时间：' + timeStr());
+  L.push('- 进度：已完成 ' + c.done + ' 期 / 精听中 ' + c.doing + ' 期 / 未开始 ' + c.todo + ' 期（共 365）');
+  L.push('- 星标 ' + c.star + ' 期 · 有笔记 ' + c.note + ' 期');
+  L.push('- 本文件收录 ' + ids.length + ' 期有标记或笔记的课程');
+  L.push('');
+  L.push('---');
+  L.push('');
+  for (var i = 0; i < ids.length; i++){
+    var id = ids[i], m = mk(id, false);
+    var d = null;
+    for (var j = 0; j < DATA.length; j++) if (DATA[j].id === id){ d = DATA[j]; break; }
+    if (!d) continue;
+    L.push('## ' + pad4(id) + ' · ' + d.title);
+    L.push('');
+    var meta = (d.code || '–') + ' ' + codeName(d.code || '') + ' · ' + d.topic +
+      ' · 状态：' + ST_NAME[m.s || 0];
+    if (m.star) meta += ' · ★星标';
+    if (m.ts) meta += ' · 更新：' + timeStr(new Date(m.ts));
+    L.push('> ' + meta);
+    L.push('');
+    if (m.note && m.note.trim()){
+      var lines = m.note.replace(/\r/g, '').split('\n');
+      for (var q = 0; q < lines.length; q++) L.push(lines[q]);
+    } else {
+      L.push('_（无笔记）_');
+    }
+    L.push('');
+    L.push('---');
+    L.push('');
+  }
+  download('EnglishPod笔记_' + ymd() + '.md', L.join('\n'), 'text/markdown;charset=utf-8');
+  toast('已导出 ' + ids.length + ' 期到 Markdown 文件');
+}
+function backupJson(){
+  flushNote();
+  var payload = {
+    app: 'EnglishPod365',
+    version: 2,
+    exported: new Date().toISOString(),
+    origin: location.origin,
+    marks: store.marks
+  };
+  download('EnglishPod备份_' + ymd() + '.json', JSON.stringify(payload, null, 2), 'application/json');
+  toast('已备份 ' + Object.keys(store.marks).length + ' 条记录');
+}
+function importJson(obj){
+  if (!obj || !obj.marks || typeof obj.marks !== 'object'){ toast('文件格式不对：缺少 marks 字段'); return; }
+  var n = 0, skip = 0;
+  for (var k in obj.marks){
+    var inc = obj.marks[k];
+    if (!inc || typeof inc !== 'object') continue;
+    var cur = store.marks[k];
+    if (!cur || (inc.ts || 0) >= (cur.ts || 0)){
+      store.marks[k] = {
+        s: inc.s || 0,
+        star: inc.star ? 1 : 0,
+        note: inc.note || '',
+        ts: inc.ts || Date.now()
+      };
+      n++;
+    } else skip++;
+  }
+  saveStore(); renderProgs(); render();
+  if (curItem) openItem(curItem.id);
+  toast('导入完成：更新 ' + n + ' 条' + (skip ? '，跳过较旧的 ' + skip + ' 条' : ''));
+}
+byId('btnExportMd').addEventListener('click', exportMarkdown);
+byId('btnBackup').addEventListener('click', backupJson);
+byId('btnRestore').addEventListener('click', function (){ byId('fileIn').click(); });
+byId('fileIn').addEventListener('change', function (){
+  var f = this.files && this.files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function (){
+    try { importJson(JSON.parse(reader.result)); }
+    catch (e) { toast('读取失败：不是有效的 JSON'); }
+  };
+  reader.readAsText(f, 'utf-8');
+  this.value = '';
+});
+
+document.addEventListener('keydown', function (ev){
+  var tag = ev.target && ev.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (ev.key === 'ArrowDown'){ ev.preventDefault(); step(1); }
+  if (ev.key === 'ArrowUp'){ ev.preventDefault(); step(-1); }
+  if ((ev.key === 's' || ev.key === 'S') && (ev.ctrlKey || ev.metaKey)){
+    ev.preventDefault();
+    flushNote();
+    toast('已保存');
+  }
+});
+window.addEventListener('beforeunload', flushNote);
+
+loadStore();
+renderProgs();
+render();
+</script>
+</body>
+</html>
