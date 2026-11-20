@@ -379,6 +379,9 @@ function openItem(id){
   if (!d) return;
   curItem = d;
   state.cur = id;
+  if (location.hash !== '#' + id) {
+    try { history.replaceState(null, '', '#' + id); } catch (e6) { location.hash = '#' + id; }
+  }
   var rows = document.querySelectorAll('.row');
   for (var r = 0; r < rows.length; r++){
     rows[r].className = 'row' + (parseInt(rows[r].getAttribute('data-id'), 10) === id ? ' on' : '');
@@ -712,6 +715,22 @@ window.addEventListener('beforeunload', flushNote);
 loadStore();
 renderProgs();
 render();
+
+/* 启动：URL 带 #期号 就直接打开那一期，否则默认打开第一期，避免首屏空白 */
+function idFromHash(){
+  var m = location.hash.match(/#(\d{1,3})/);
+  if (!m) return null;
+  var n = parseInt(m[1], 10);
+  for (var i = 0; i < DATA.length; i++) if (DATA[i].id === n) return n;
+  return null;
+}
+var startId = idFromHash();
+if (startId === null && DATA.length) startId = DATA[0].id;
+if (startId !== null) openItem(startId);
+window.addEventListener('hashchange', function (){
+  var n = idFromHash();
+  if (n !== null) openItem(n);
+});
 </script>
 </body>
 </html>
